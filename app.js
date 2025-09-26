@@ -131,7 +131,7 @@ function QuizApp() {
 
   return (
     <div className="quiz-container">
-      <h1>MOCK 4 Listening</h1>
+      <h1>MOCK 1 Listening</h1>
 
       {!submitted && (
         <div className="part-selection">
@@ -182,7 +182,7 @@ function QuizApp() {
       ))}
 
       {!submitted && filteredQuestions.length > 0 && (
-        <button onClick={handleSubmit} style={{ marginTop: 10 }}>Submit</button>
+        <button id = "submit-btn" onClick={handleSubmit} style={{ marginTop: 10 }}>Submit</button>
       )}
 
       {showModal && (
