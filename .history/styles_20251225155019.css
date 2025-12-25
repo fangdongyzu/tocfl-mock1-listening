@@ -247,7 +247,7 @@ header p {
 
 .audio-progress-container {
     width: 100%;
-    height: 13px;
+    height: 8px;
     background-color: #bdc3c7;
     border-radius: 4px;
     cursor: pointer;
@@ -256,6 +256,7 @@ header p {
 }
 
 .audio-progress-container:hover {
+    height: 10px;
     background-color: #aeb6bf;
 }
 

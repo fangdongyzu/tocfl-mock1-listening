@@ -256,6 +256,7 @@ header p {
 }
 
 .audio-progress-container:hover {
+    height: 10px;
     background-color: #aeb6bf;
 }
 
