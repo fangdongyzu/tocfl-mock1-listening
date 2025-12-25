@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOCK 1 Listening</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>MOCK 1 Reading</h1>
+      <p>TOCFL Reading Practice</p>
+    </header>
+
+    <div class="part-selection">
+      <h2>Choose the part(s) that you want to practice：</h2>
+      <div class="part-checkboxes">
+        <label class="part-checkbox">
+          <input type="checkbox" data-part="1">
+          <span class="checkmark"></span>
+          Part 1: Sentence Comprehension
+        </label>
+        <label class="part-checkbox">
+          <input type="checkbox" data-part="2">
+          <span class="checkmark"></span>
+          Part 2: Picture Description
+        </label>
+        <label class="part-checkbox">
+          <input type="checkbox" data-part="3">
+          <span class="checkmark"></span>
+          Part 3: Word Fill-in
+        </label>
+        <label class="part-checkbox">
+          <input type="checkbox" data-part="4">
+          <span class="checkmark"></span>
+          Part 4: Paragraph Completion
+        </label>
+        <label class="part-checkbox">
+          <input type="checkbox" data-part="5">
+          <span class="checkmark"></span>
+          Part 5: Reading Comprehension
+        </label>
+      </div>
+      <button id="start-quiz-btn" class="start-btn">Start Quiz</button>
+    </div>
+
+    <div id="quiz-container" class="quiz-container hidden">
+      <div class="quiz-header">
+        <h2 id="part-title">Quiz in Progress</h2>
+      </div>
+
+      <div id="question-container">
+        </div>
+
+      <div class="navigation">
+        <button id="prev-btn" class="nav-btn" style="display: none;">Previous Part</button>
+        <button id="next-btn" class="nav-btn" style="display: none;">Next Part</button>
+        <button id="submit-btn" class="submit-btn" style="display: none;">Submit Answers</button>
+      </div>
+    </div>
+
+    <div id="results-container" class="results-container hidden">
+      <h2 style="margin-bottom: 20px; color: #2c3e50;">Results</h2>
+      
+      <div class="score">
+        <h3><span id="score">0</span> / <span id="total">0</span></h3>
+        <p>Submitted: <span id="submit-time"></span></p>
+      </div>
+
+      <div class="result-actions">
+        <button id="restart-btn" class="restart-btn">Retake Test</button>
+        <a href="https://fangdongyzu.github.io/tocflmock/" class="home-btn">Go to Home Page</a>
+      </div>
+
+      <div class="filter-section">
+        <button class="result-filter-btn active" data-filter="all">All</button>
+        <button class="result-filter-btn" data-filter="correct">Correct</button>
+        <button class="result-filter-btn" data-filter="wrong">Wrong</button>
+        <button class="result-filter-btn" data-filter="unanswered">Unanswered</button>
+      </div>
+
+      <div id="results-details" class="results-details">
+        </div>
+      
+      <div class="part-breakdown" id="part-breakdown"></div>
+    </div>
+  </div>
+
+  <script src="quizData.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

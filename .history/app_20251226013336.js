@@ -165,10 +165,9 @@ function QuizApp() {
     setCurrentPartIndex(0);
   };
 
-  const handleChange = (qId, letterCode) => {
+  const handleChange = (qId, option) => {
     if (submitted) return;
-    // Store the LETTER CODE (A, B, C) instead of the option text
-    setAnswers(prev => ({ ...prev, [qId]: letterCode }));
+    setAnswers(prev => ({ ...prev, [qId]: option }));
   };
 
   const handleNextPart = () => {
@@ -193,10 +192,8 @@ function QuizApp() {
     });
 
     allSelectedQuestions.forEach(q => {
-      // answers[q.id] now contains "A", "B", etc.
-      // q.answer contains "A", "B", etc.
       const selected = answers[q.id];
-      const isCorrect = selected === q.answer;
+      const isCorrect = selected && selected === q.answer;
       
       if (performance[q.part]) {
           performance[q.part].total += 1;
@@ -315,19 +312,15 @@ function QuizApp() {
 
               <div className="options">
                 {q.options.map((opt, idx) => {
-                  // Determine the letter (A, B, C...) based on index
-                  const letterCode = String.fromCharCode(65 + idx);
-                  // Check if this option is selected by comparing the Letter Code
-                  const isSelected = answers[q.id] === letterCode; 
-                  
+                  const letter = String.fromCharCode(65 + idx);
+                  const isSelected = answers[q.id] === opt; 
                   return (
                     <div 
                       key={opt} 
                       className={`option ${isSelected ? 'selected' : ''}`}
-                      // Pass the letterCode ("A", "B"...) to handleChange
-                      onClick={() => handleChange(q.id, letterCode)}
+                      onClick={() => handleChange(q.id, opt)}
                     >
-                      {/* Removed the 'option-letter' div as requested */}
+                      <div className="option-letter">{letter}</div>
                       <div className="option-text">{opt}</div>
                     </div>
                   );
@@ -380,7 +373,7 @@ function QuizApp() {
                 Retake Test
               </button>
               <button className="home-btn" onClick={() => window.location.href = "https://fangdongyzu.github.io/tocflmock/"}>
-                Go to Home Page
+                Home Page
               </button>
             </div>
 

@@ -303,7 +303,27 @@ header p {
     border-color: #2980b9;
 }
 
-/* Removed option-letter styles as element is removed from JS */
+.option.selected .option-letter {
+    background: white;
+    color: #3498db;
+}
+
+.option-letter {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #3498db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-weight: bold;
+    color: #3498db;
+    background: white;
+    transition: all 0.3s;
+    font-size: 1.1em;
+    flex-shrink: 0;
+}
 
 .option-text {
     flex: 1;
@@ -360,9 +380,10 @@ header p {
 }
 
 /* ========================================= */
-/* RESULTS / MODAL STYLES (Requested)        */
+/* NEW CSS REQUESTED BY USER           */
 /* ========================================= */
 
+/* Result Actions & Home Button */
 .result-actions {
     display: flex;
     justify-content: center;
@@ -394,6 +415,7 @@ header p {
     background: #1a252f;
 }
 
+/* Results */
 .results-container {
     background: white;
     padding: 30px 25px;

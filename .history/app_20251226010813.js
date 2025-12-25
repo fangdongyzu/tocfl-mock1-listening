@@ -118,10 +118,11 @@ function QuizApp() {
   const [answers, setAnswers] = React.useState({});
   const [submitted, setSubmitted] = React.useState(false);
   const [score, setScore] = React.useState(0);
-  const [partPerformance, setPartPerformance] = React.useState({});
   const [submittedTime, setSubmittedTime] = React.useState(null);
   
+  // Controls visibility of questions vs selection panel
   const [started, setStarted] = React.useState(false);
+  
   const [showModal, setShowModal] = React.useState(false);
   const [filterType, setFilterType] = React.useState('all');
   const [showTranscript, setShowTranscript] = React.useState({});
@@ -144,6 +145,7 @@ function QuizApp() {
     return quizData.filter(q => q.part === activePart);
   }, [sortedSelectedParts, currentPartIndex]);
 
+  // Scroll to questions when practice starts OR part changes
   React.useEffect(() => {
     if (started) {
       setTimeout(() => {
@@ -165,13 +167,13 @@ function QuizApp() {
     setCurrentPartIndex(0);
   };
 
-  const handleChange = (qId, letterCode) => {
+  const handleChange = (qId, option) => {
     if (submitted) return;
-    // Store the LETTER CODE (A, B, C) instead of the option text
-    setAnswers(prev => ({ ...prev, [qId]: letterCode }));
+    setAnswers(prev => ({ ...prev, [qId]: option }));
   };
 
   const handleNextPart = () => {
+      // Pause audio before moving
       if (currentAudio) {
           currentAudio.pause();
           currentAudio.currentTime = 0;
@@ -185,29 +187,16 @@ function QuizApp() {
       return;
     }
 
-    let totalScore = 0;
-    const performance = {};
+    // REMOVED CONFIRMATION POPUP
+    // if (!window.confirm("Are you sure you want to submit?")) return;
 
-    sortedSelectedParts.forEach(part => {
-        performance[part] = { correct: 0, total: 0 };
-    });
-
+    let newScore = 0;
     allSelectedQuestions.forEach(q => {
-      // answers[q.id] now contains "A", "B", etc.
-      // q.answer contains "A", "B", etc.
       const selected = answers[q.id];
-      const isCorrect = selected === q.answer;
-      
-      if (performance[q.part]) {
-          performance[q.part].total += 1;
-          if (isCorrect) performance[q.part].correct += 1;
-      }
-
-      if (isCorrect) totalScore++;
+      if (selected && selected[1] === q.answer) newScore++;
     });
 
-    setScore(totalScore);
-    setPartPerformance(performance);
+    setScore(newScore);
     setSubmittedTime(new Date().toLocaleString());
     setSubmitted(true);
     setShowModal(true);
@@ -217,9 +206,9 @@ function QuizApp() {
     const source = allSelectedQuestions;
     switch(filterType) {
       case 'correct':
-        return source.filter(q => answers[q.id] && answers[q.id] === q.answer);
+        return source.filter(q => answers[q.id] && answers[q.id][1] === q.answer);
       case 'wrong':
-        return source.filter(q => answers[q.id] && answers[q.id] !== q.answer);
+        return source.filter(q => answers[q.id] && answers[q.id][1] !== q.answer);
       case 'unanswered':
         return source.filter(q => !answers[q.id]);
       default:
@@ -227,33 +216,27 @@ function QuizApp() {
     }
   };
 
-  // Helper for percentage
-  const totalQuestions = allSelectedQuestions.length;
-  const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
-
   const renderResultItem = (q) => {
     const selected = answers[q.id];
-    const isCorrect = selected === q.answer;
+    const isCorrect = selected && selected[1] === q.answer;
     const isUnanswered = !selected;
     
+    // CHANGED: Use classes instead of inline styles
     let statusClass = '';
     if (isCorrect) statusClass = 'correct';
     else if (isUnanswered) statusClass = 'unanswered';
     else statusClass = 'incorrect';
 
-    let statusText = isCorrect ? "✅ Correct" : (isUnanswered ? "⚠️ Unanswered" : `❌ Incorrect`);
-
     return (
       <div key={q.id} className={`result-item ${statusClass}`}>
-        <div className="result-question">
-          {q.id}. {q.question}
-        </div>
-        <div className="result-answer">
-           <p style={{ fontWeight: 'bold' }}>{statusText}</p>
-           {!isCorrect && <p>Your Answer: {selected || "None"}</p>}
-           {!isCorrect && <p>Correct Answer: {q.answer}</p>}
-           {q.remark && <p style={{ marginTop: 5, fontSize: '0.9em' }}>💡 {q.remark}</p>}
-        </div>
+        <p><strong>{q.id}.</strong> {q.question}</p>
+        <p>
+           {isCorrect && "✅ Correct"}
+           {isUnanswered && "⚠️ Unanswered"}
+           {!isCorrect && !isUnanswered && `❌ Your Answer: ${selected}`}
+        </p>
+        {!isCorrect && <p><strong>Correct Answer:</strong> {q.answer}</p>}
+        {q.remark && <p style={{ marginTop: 5, fontSize: '0.9em', color: '#555' }}>💡 {q.remark}</p>}
       </div>
     );
   };
@@ -315,19 +298,14 @@ function QuizApp() {
 
               <div className="options">
                 {q.options.map((opt, idx) => {
-                  // Determine the letter (A, B, C...) based on index
-                  const letterCode = String.fromCharCode(65 + idx);
-                  // Check if this option is selected by comparing the Letter Code
-                  const isSelected = answers[q.id] === letterCode; 
-                  
+                  const isSelected = answers[q.id] === opt;
                   return (
                     <div 
                       key={opt} 
                       className={`option ${isSelected ? 'selected' : ''}`}
-                      // Pass the letterCode ("A", "B"...) to handleChange
-                      onClick={() => handleChange(q.id, letterCode)}
+                      onClick={() => handleChange(q.id, opt)}
                     >
-                      {/* Removed the 'option-letter' div as requested */}
+                      <div className="option-letter">{String.fromCharCode(65 + idx)}</div>
                       <div className="option-text">{opt}</div>
                     </div>
                   );
@@ -364,53 +342,27 @@ function QuizApp() {
 
       {showModal && (
         <div className="modal">
-          <div className="modal-content results-container">
-            <h2 style={{ marginBottom: 20 }}>Results</h2>
+          <div className="modal-content">
+            <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Results</h2>
             
-            {/* 1. Score Summary */}
+            {/* CHANGED: Use .score class */}
             <div className="score">
-               <p>Score: <span id="score">{score}</span> / {totalQuestions}</p>
-               <p>Accuracy: <span id="percentage">{percentage}</span>%</p>
-               <p style={{ fontSize: '1em' }}>Submitted: {submittedTime}</p>
+               <h3>{score} / {allSelectedQuestions.length}</h3>
+               <p>Submitted: {submittedTime}</p>
             </div>
 
-            {/* 2. Actions (Retake / Home) */}
+            {/* Action Buttons */}
             <div className="result-actions">
               <button className="restart-btn" onClick={() => window.location.reload()}>
                 Retake Test
               </button>
               <button className="home-btn" onClick={() => window.location.href = "https://fangdongyzu.github.io/tocflmock/"}>
-                Go to Home Page
+            Home Page
               </button>
             </div>
 
-            {/* 3. Performance Breakdown */}
-            <div className="part-breakdown">
-                {sortedSelectedParts.map(part => {
-                    const stats = partPerformance[part] || { correct: 0, total: 0 };
-                    const pPercent = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-                    return (
-                        <div key={part} className="breakdown-item">
-                            <h4>{PART_NAMES[part]}</h4>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#555' }}>
-                                <span>Score: {stats.correct} / {stats.total}</span>
-                                <span>{pPercent}%</span>
-                            </div>
-                            <div style={{ width: '100%', height: '8px', background: '#eee', borderRadius: '4px', marginTop: '5px' }}>
-                                <div style={{ 
-                                    width: `${pPercent}%`, 
-                                    height: '100%', 
-                                    background: pPercent >= 80 ? '#27ae60' : (pPercent >= 60 ? '#f39c12' : '#e74c3c'),
-                                    borderRadius: '4px' 
-                                }}></div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* 4. Filters */}
-            <div className="filter-section">
+            {/* Filter Buttons */}
+            <div className="modal-buttons">
               <button 
                 className={`result-filter-btn ${filterType === 'all' ? 'active' : ''}`}
                 onClick={() => setFilterType('all')}
@@ -437,8 +389,7 @@ function QuizApp() {
               </button>
             </div>
 
-            {/* 5. Detailed List */}
-            <div className="results-details">
+            <div className="results-list">
                {getFilteredResults().length === 0 ? (
                  <p style={{ textAlign: 'center', padding: 20 }}>No questions found for this filter.</p>
                ) : (
